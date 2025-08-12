@@ -15,21 +15,24 @@ set "data_center_hint=%~1"
 set "replace=DataCenterHint=%data_center_hint%"
 
 rem config.iniから値を取得
-set "input_file="
+set "game_settings_ini="
 set "r6s_exe="
+set "steam_r6s_link="
 set "restart="
+
 for /f "usebackq tokens=1,2 delims==" %%A in ("%SCRIPT_DIR%config.ini") do (
-    if /i "%%A"=="input_file" set "input_file=%%B"
-    if /i "%%A"=="r6s_exe"    set "r6s_exe=%%B"
-    if /i "%%A"=="restart"    set "restart=%%B"
+    if /i "%%A"=="game_settings_ini" set "game_settings_ini=%%B"
+    if /i "%%A"=="r6s_exe"           set "r6s_exe=%%B"
+    if /i "%%A"=="steam_r6s_link"    set "steam_r6s_link=%%B"
+    if /i "%%A"=="restart"           set "restart=%%B"
 )
-if not defined input_file (
+if "%game_settings_ini%"=="" (
     echo 入力ファイルパスがconfig.iniから取得できませんでした
     pause
     exit /b
 )
 if "%restart%"=="1" (
-    if not defined r6s_exe (
+    if "%r6s_exe%"=="" (
         echo "restart=1ですが、シージの実行ファイルパス(r6s_exe)がconfig.iniから取得できませんでした"
         pause
         exit /b
@@ -49,15 +52,15 @@ if "%restart%"=="1" (
     )
 )
 
-set "backup_file=%input_file%.bk"
-set "output_file=%input_file%.tmp"
+set "backup_file=%game_settings_ini%.bk"
+set "output_file=%game_settings_ini%.tmp"
 
 echo 既存のGameSettings.iniをバックアップします
-copy /Y "%input_file%" "%backup_file%" >nul
+copy /Y "%game_settings_ini%" "%backup_file%" >nul
 
 rem 空行も含めて全行処理
 (
-    for /f "usebackq delims=" %%A in (`findstr /N "^" "%input_file%"`) do (
+    for /f "usebackq delims=" %%A in (`findstr /N "^" "%game_settings_ini%"`) do (
         set "line=%%A"
         set "line=!line:*:=!"
         rem DataCenterHint=で始まる行を置換
@@ -70,15 +73,17 @@ rem 空行も含めて全行処理
 ) > "%output_file%"
 
 rem 元ファイルを上書き
-move /Y "%output_file%" "%input_file%" >nul
+move /Y "%output_file%" "%game_settings_ini%" >nul
 echo GameSettings.iniのDataCenterHintを%data_center_hint%に変更しました
 
 rem アプリケーション起動処理
 if "%restart%"=="1" (
-    if defined r6s_exe (
-        echo アプリケーションを起動しています...
-        timeout /t 7 >nul
+    echo アプリケーションを起動しています...
+    timeout /t 7 >nul
+    if "%steam_r6s_link%"=="" (
         start "" "%r6s_exe%"
+    ) else (
+        start "" "%steam_r6s_link%"
     )
 )
 
