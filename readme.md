@@ -32,4 +32,5 @@ A. 改行コードがLFになっています。VSCodeなどでCRLFに変換し�
 | playfab/southeastasia | 東南アジア | インドネシア<br>マレーシア<br>シンガポール<br>タイ<br>フィリピン<br>ベトナム<br>ラオス<br>カンボジア<br>ミャンマー（ビルマ）<br>ブルネイ<br>東ティモール | 低い       | 65~75 | 
 
 ※defaultを選択した場合、最もPingが小さい地域のデータセンターが自動で選択されます。
+
 https://learn.microsoft.com/ja-jp/gaming/playfab/multiplayer/networking/supported-azure-regions
