@@ -31,6 +31,8 @@ if "%game_settings_ini%"=="" (
     pause
     exit /b
 )
+
+set "restart_result="
 if "%restart%"=="1" (
     if "%r6s_exe%"=="" (
         echo "restart=1ですが、シージの実行ファイルパス(r6s_exe)がconfig.iniから取得できませんでした"
@@ -43,9 +45,8 @@ if "%restart%"=="1" (
 
     rem プロセスの存在確認
     tasklist /FI "IMAGENAME eq !proc_name!" 2>NUL | find /I "!proc_name!" >NUL
-    if errorlevel 1 (
-        rem プロセスが存在しないため終了しない
-    ) else (
+    set restart_result=%ERRORLEVEL%
+    if not "%restart_result%"=="1" (
         echo アプリケーションを終了します...
         taskkill /IM "!proc_name!"
         echo アプリケーションを終了しました
@@ -79,10 +80,16 @@ echo GameSettings.iniのDataCenterHintを%data_center_hint%に変更しました
 rem アプリケーション起動処理
 if "%restart%"=="1" (
     echo アプリケーションを起動しています...
-    timeout /t 7 >nul
     if "%steam_r6s_link%"=="" (
+        if not "%restart_result%"=="1" (
+            
+            timeout /t 30 >nul
+        )
         start "" "%r6s_exe%"
     ) else (
+	    if not "%restart_result%"=="1" (
+            timeout /t 10 >nul
+        )
         start "" "%steam_r6s_link%"
     )
 )
